@@ -28,4 +28,22 @@ const verifyUser = (req,res,next) => {
        res.status(401).json({  message: "Not Authenticated" })
    }
 }
-module.exports = {verifyUser,verifyToken};
+
+const verifyAdmin = (req,res,next) => {
+   try{
+
+      const user = verifyToken(req.headers.token);
+      console.log(user)
+      if(user && user.role === 'admin'){
+         next();
+      }
+      else{
+         return res.status(401).json({success:false ,message: "You are not admin" })
+      }
+   }
+   catch(error){
+      res.status(500).json({success:false,message:error})
+   }
+   
+}
+module.exports = {verifyUser,verifyToken,verifyAdmin};

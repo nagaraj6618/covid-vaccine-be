@@ -1,0 +1,64 @@
+const centerModel = require('../model/centerModel');
+
+const getAllVaccineCenter = async(req,res) => {
+   try{
+      const allVaccineCenter = await centerModel.find();
+      return res.status(200).json({success:true,message:'Retrived all the centers successfully',data:allVaccineCenter});
+   }
+   catch(error){
+      return res.status(500).json({success:false,message:'Error while retriving the centers',error:error});
+   }
+}
+const getVaccineById = async(req,res) => {
+   try{
+      const id = req.params.id;
+
+      const vaccineCenter = await centerModel.findById(id);
+      console.log(vaccineCenter);
+      return res.status(200).json({success:true,message:'Retrived Center Successfully',data:vaccineCenter})
+   }
+   catch(error){
+      return res.status(500).json({success:false,message:'Error while retriving the center',error:error});
+   }
+}
+
+const addNewVaccineCenter = async(req ,res) => {
+
+   console.log(req.body);
+   try{
+      const newCenter = await new centerModel(req.body);
+      console.log(newCenter);
+      await newCenter.save();
+      return res.status(200).json({success:true,message:'New Center Added Successfully',data:newCenter})
+   }
+   catch(error){
+      return res.status(500).json({success:false,message:'Center not added',error:error});
+   }
+   
+   
+}  
+
+const updateVaccineCenter = async(req,res)=> {
+   try{
+      const id = req.params.id
+      const updateData = req.body;
+      const updatedCenterData = await centerModel.findByIdAndUpdate(id,updateData);
+      return res.status(200).json({success:true,message:"Updated Successfully",data:updatedCenterData})
+   }
+   catch(error){
+      return res.status(500).json({success:false,message:"Center not updated",error:error});
+   }
+}
+
+const deleteCenterById = async(req,res) => {
+   try{
+      const id = req.params.id;
+      const deleteCenter = await centerModel.findByIdAndDelete(id);
+      return res.status(200).json({success:true,message:"Center deleted successfully",data:deleteCenter})
+   }
+   catch(error){
+      return res.status(500).json({success:false,message:"Center not deleted",error:error});
+   }
+}
+
+module.exports = {addNewVaccineCenter,updateVaccineCenter,getAllVaccineCenter,getVaccineById,deleteCenterById};

@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 
 const authRoute = require('./route/authRoute');
+const vaccineCenter = require('./route/centerRoute');
 
 function dbConnection () {
    mongoose.connect(process.env.MONGODB_URL)
@@ -23,6 +24,8 @@ app.use(express.urlencoded({extended:true}));
 
 //route page;
 app.use('/api/v1/auth',authRoute);
+app.use('/api/v1/center',vaccineCenter);
+
 
 app.get('/api/v1/',(req,res) => {
    res.status(200).json({message:'success',data:'server running'});
