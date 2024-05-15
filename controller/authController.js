@@ -2,7 +2,9 @@ const axios = require('axios');
 const bcrypt = require('bcrypt');
 const userModelSchema = require('../model/userModel');
 const OTPModel = require('../model/OTPModel');
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
+const {verifyToken} = require('./authVerify')
 const transporter = nodemailer.createTransport({
    service: 'Gmail',
    auth: {
@@ -65,9 +67,48 @@ const registerController = async(req,res) => {
    
 }
 
-const loginController = (req,res) => {
-   res.status(200).json({message:'Login Working',data:'Working'});
+const loginController = async(req,res) => {
+
+   console.log(req.body)
+   const userByName = await userModelSchema.findOne({ username: req.body.emailorusername });
+   const userByEmail = await userModelSchema.findOne({ email: req.body.emailorusername });
+   let user = userByEmail || userByName;
+   if (!user) {
+      console.log("Accound doesn't exist");
+      return res.status(400).json({ success:false,message: "Account doesn't Exist" })
+   }
+   const userData = {
+      userName: user.userName,
+      name: user.name,
+   }
+   const correctPassword = await bcrypt.compareSync(req.body.password, user.password);
+   if (!correctPassword) {
+      return res.status(400).json({ success:false,message: "Invalid Password." });
+   }
+   const token = jwt.sign(
+      {
+         id: user._id,
+         role: user.role,
+      },
+      process.env.JWT_SECRET_KEY,
+      {
+         expiresIn: "1h"
+      }
+   );
+
+   res.cookie('accesstoken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      expires: new Date(Date.now() + 600000),
+      partitioned: 'None'
+
+   }).status(200).json({ success:true,message: "Login Success", data: userData, token: token });
+
+
 }
+
+
 
 const OTPVerification = async(req,res) => {
    try{
@@ -151,4 +192,36 @@ catch(error){
    return res.status(500).json({success:false,message:error.message});
 }
 }
-module.exports = {loginController,registerController,OTPVerification}
+
+async function resetPassword(req, res) {
+   console.log(req.body);
+   console.log(req.headers.token)
+   try {
+      const data = verifyToken(req.headers.token);
+      console.log(data)
+      if (data) {
+         const salt = bcrypt.genSaltSync(10);
+         const hash = bcrypt.hashSync(req.body.newpassword, salt)
+         console.log(hash);
+         const userData = await userModelSchema.findById(data.id);
+         if(userData){
+            const correctPassword = await bcrypt.compareSync(req.body.oldpassword, userData.password);
+            if(!correctPassword){
+               return res.status(400).json({message:'Old password is incorrect'});
+            }
+            const updatePassword = await userModelSchema.findByIdAndUpdate(data.id,{password:hash},{new:true})
+         console.log(updatePassword)
+         return res.status(200).json({ message: 'Updated Successfully!',data:updatePassword });
+         }
+         return res.status(200).json({message:'User must login'});
+      }
+      res.status(400).json({ message: 'Not Updated..' })
+   }
+   catch (error) {
+      res.status(500).json({ message: 'Internal Server error' })
+   }
+}
+
+
+
+module.exports = {loginController,registerController,OTPVerification,resetPassword}
