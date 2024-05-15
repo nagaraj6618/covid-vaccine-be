@@ -56,7 +56,7 @@ const registerController = async(req,res) => {
       await newUser.save();
       console.log(newUser);
       await sendOTPVerificationEmail(newUser,salt,res);
-      res.status(200).json({success:true,message:'Registered Successfully',data:newUser});
+      // res.status(200).json({success:true,message:'Registered Successfully',data:newUser});
 
    }
    catch(error){
