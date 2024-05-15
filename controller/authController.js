@@ -69,13 +69,46 @@ const loginController = (req,res) => {
    res.status(200).json({message:'Login Working',data:'Working'});
 }
 
+const OTPVerification = async(req,res) => {
+   try{
+      console.log(req.body);
+      const id = req.params.id;
+      const {otp} = req.body;
+      
+      const userOTPVerificationRecords = await OTPModel.find({userId:id});
+      if(userOTPVerificationRecords.length<=0){
+         return res.status(400).json({success:false,message:"OTP doesn't exist"});
+      }
+      const {expiresAt} = userOTPVerificationRecords[0];
+      const hashOtp = userOTPVerificationRecords[0].otp;
+      if(expiresAt < Date.now()){
+         await OTPModel.deleteMany({userId:id});
+         return res.status(200).json({message:'Code expired',success:false});
+      }
+      else{
+         const isOtpValid = await bcrypt.compareSync(otp,hashOtp);
+         if(!isOtpValid){
+            return res.status(400).json({success:false,message:'OTP is not valid'});
+         }
+         const updateUserData = await userModelSchema.updateOne({_id:id},{verified:true});
+         await OTPModel.deleteMany({userId:id});
+         return res.status(200).json({success:true,message:'OTP verification Successfull',data:updateUserData})
+      }
+      
+   }
+   catch(error){
+      res.status(500).json({success:false,error:error,message:'Internal Server Error'})
+   }
+   
+
+}
 
 
 async function sendOTPVerificationEmail({_id,email},salt,res){
 
    try{
       console.log(_id,email)
-      const otp = `${Math.floor(1000 + Math.random() + 9000)}`;
+      const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
       const OTPMailOption = {
          from: process.env.AUTH_EMAIL,
          to: email,
@@ -118,4 +151,4 @@ catch(error){
    return res.status(500).json({success:false,message:error.message});
 }
 }
-module.exports = {loginController,registerController}
+module.exports = {loginController,registerController,OTPVerification}
