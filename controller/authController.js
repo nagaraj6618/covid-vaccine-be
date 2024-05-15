@@ -55,7 +55,7 @@ const registerController = async(req,res) => {
       const newUser = new userModelSchema(userData);
       await newUser.save();
       console.log(newUser);
-      sendOTPVerificationEmail(newUser,salt,res);
+      await sendOTPVerificationEmail(newUser,salt,res);
       res.status(200).json({success:true,message:'Registered Successfully',data:newUser});
 
    }
@@ -110,7 +110,7 @@ async function sendOTPVerificationEmail({_id,email},salt,res){
       console.log(_id,email)
       const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
       const OTPMailOption = {
-         from: process.env.AUTH_EMAIL,
+         from: `nagaraj516700@gmail.com`,
          to: email,
          subject: "Your OTP Code for Verification",
          html: `
