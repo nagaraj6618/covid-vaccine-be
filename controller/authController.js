@@ -77,9 +77,11 @@ const loginController = async(req,res) => {
       console.log("Accound doesn't exist");
       return res.status(400).json({ success:false,message: "Account doesn't Exist" })
    }
+   // console.log(user)
    const userData = {
       userName: user.userName,
       name: user.name,
+      role:user.role,
    }
    const correctPassword = await bcrypt.compareSync(req.body.password, user.password);
    if (!correctPassword) {
