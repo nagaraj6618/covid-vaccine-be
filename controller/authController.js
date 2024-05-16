@@ -207,21 +207,36 @@ async function resetPassword(req, res) {
          if(userData){
             const correctPassword = await bcrypt.compareSync(req.body.oldpassword, userData.password);
             if(!correctPassword){
-               return res.status(400).json({message:'Old password is incorrect'});
+               return res.status(400).json({success:false,message:'Old password is incorrect'});
             }
             const updatePassword = await userModelSchema.findByIdAndUpdate(data.id,{password:hash},{new:true})
          console.log(updatePassword)
-         return res.status(200).json({ message: 'Updated Successfully!',data:updatePassword });
+         return res.status(200).json({success:true, message: 'Updated Successfully!',data:updatePassword });
          }
-         return res.status(200).json({message:'User must login'});
+         return res.status(200).json({success:false,message:'User must login'});
       }
-      res.status(400).json({ message: 'Not Updated..' })
+      res.status(400).json({ success:false,message: 'Not Updated..' })
    }
    catch (error) {
-      res.status(500).json({ message: 'Internal Server error' })
+      res.status(500).json({ success:false,message: 'Internal Server error' })
+   }
+}
+
+const getUserDetail = async(req,res) => {
+   try{
+      
+      const user = await verifyToken(req.headers.token);
+      const userData = await userModelSchema.findById(user.id);
+      if(userData.length<=0){
+         return res.status(404).json({success:false,message:"User doesn't exist"});
+      }
+
+      return res.status(200).json({success:true,message:'success',data:userData});
+   }
+   catch(error){
+      return res.status(500).json({ success:false,message: 'Internal Server error',error:error })
    }
 }
 
 
-
-module.exports = {loginController,registerController,OTPVerification,resetPassword}
+module.exports = {loginController,registerController,OTPVerification,resetPassword,getUserDetail}
