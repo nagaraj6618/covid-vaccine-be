@@ -70,7 +70,7 @@ const registerController = async(req,res) => {
 const loginController = async(req,res) => {
 
    console.log(req.body)
-   const userByName = await userModelSchema.findOne({ username: req.body.emailorusername });
+   const userByName = await userModelSchema.findOne({ userName: req.body.emailorusername });
    const userByEmail = await userModelSchema.findOne({ email: req.body.emailorusername });
    let user = userByEmail || userByName;
    if (!user) {
@@ -115,7 +115,7 @@ const OTPVerification = async(req,res) => {
       console.log(req.body);
       const id = req.params.id;
       const {otp} = req.body;
-      
+      console.log("otp:",otp)
       const userOTPVerificationRecords = await OTPModel.find({userId:id});
       if(userOTPVerificationRecords.length<=0){
          return res.status(400).json({success:false,message:"OTP doesn't exist"});
