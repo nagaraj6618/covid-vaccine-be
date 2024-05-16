@@ -9,7 +9,7 @@ const getAllVaccineCenter = async(req,res) => {
       return res.status(500).json({success:false,message:'Error while retriving the centers',error:error});
    }
 }
-const getVaccineById = async(req,res) => {
+const getVaccineCenterById = async(req,res) => {
    try{
       const id = req.params.id;
 
@@ -72,4 +72,4 @@ const deleteCenterById = async(req,res) => {
    }
 }
 
-module.exports = {addNewVaccineCenter,updateVaccineCenter,getAllVaccineCenter,getVaccineById,deleteCenterById};
+module.exports = {addNewVaccineCenter,updateVaccineCenter,getAllVaccineCenter,getVaccineCenterById,deleteCenterById};
