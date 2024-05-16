@@ -37,7 +37,7 @@ const verifyUser = (req, res, next) => {
 
 const verifyAdmin = (req, res, next) => {
    try {
-
+      
       const user = verifyToken(req.headers.token);
       console.log(user)
       if (user && user.role === 'admin') {

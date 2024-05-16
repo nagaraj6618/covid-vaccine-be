@@ -25,14 +25,25 @@ const getVaccineById = async(req,res) => {
 const addNewVaccineCenter = async(req ,res) => {
 
    console.log(req.body);
+   const {name,email,phone,address,dosageCount} = req.body;
+   // res.status(200).json({message:"working",data:{name,email,phone,address,dosageCount}})
    try{
-      const newCenter = await new centerModel(req.body);
-      console.log(newCenter);
-      await newCenter.save();
-      return res.status(200).json({success:true,message:'New Center Added Successfully',data:newCenter})
+      // console.log(req.body);
+      const centerData = {
+         name:name,
+         email:email,
+         phone:phone,
+         address:address,
+         dosageCount:dosageCount
+      }
+      // console.log(centerData)
+      const newCenterData = await new centerModel(centerData);
+      console.log(newCenterData);
+      await newCenterData.save();
+      res.status(200).json({success:true,message:'New Center Added Successfully',data:newCenterData})
    }
    catch(error){
-      return res.status(500).json({success:false,message:'Center not added',error:error});
+      res.status(500).json({success:false,message:'Center not added',error:error});
    }
    
    

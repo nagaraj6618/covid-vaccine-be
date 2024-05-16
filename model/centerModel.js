@@ -3,20 +3,19 @@ const mongoose = require('mongoose');
 const centerSchema = new mongoose.Schema({
   name: {
    type:String,
+   unique:true,
    required:true
   },
 
   phone: {
    type:String,
-   unique:true,
-   required:true,
+   required:true
   },
 
   email: {
    type:String,
+   required:true
    
-   unique:true,
-   required:true,
   },
 
   openingHours: {
@@ -26,20 +25,18 @@ const centerSchema = new mongoose.Schema({
 
   capacityPerDay: {
    type:Number,
-   required:true,
+   
    default:10
   },
-  
   patientId:Array,
-
   address:{
+      required:true,
       type:String,
-      required:true
    },
 
    dosageCount:{
-      type:Number,
       required:true,
+      type:String,
    }
 });
 
