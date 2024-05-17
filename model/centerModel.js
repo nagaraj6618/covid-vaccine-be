@@ -30,14 +30,20 @@ const centerSchema = new mongoose.Schema({
   },
   patientId:Array,
   address:{
-      required:true,
-      type:String,
+      place:String,
+      city:String,
+      pincode:String,
+      state:String,
    },
 
    dosageCount:{
       required:true,
       type:String,
-   }
+   },
+   status:{
+      type:Boolean,
+      default:true,
+   },
 });
 
 module.exports = mongoose.model('center',centerSchema);

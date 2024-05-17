@@ -25,7 +25,7 @@ const getVaccineCenterById = async(req,res) => {
 const addNewVaccineCenter = async(req ,res) => {
 
    console.log(req.body);
-   const {name,email,phone,address,dosageCount} = req.body;
+   const {name,email,phone,address,dosageCount,city,pincode,state} = req.body;
    // res.status(200).json({message:"working",data:{name,email,phone,address,dosageCount}})
    try{
       // console.log(req.body);
@@ -33,7 +33,12 @@ const addNewVaccineCenter = async(req ,res) => {
          name:name,
          email:email,
          phone:phone,
-         address:address,
+         address:{
+            place:address,
+            city:city,
+            state:state,
+            pincode:pincode,
+         },
          dosageCount:dosageCount
       }
       // console.log(centerData)
@@ -53,8 +58,10 @@ const updateVaccineCenter = async(req,res)=> {
    try{
       const id = req.params.id
       const updateData = req.body;
+      console.log(req.body)
       const updatedCenterData = await centerModel.findByIdAndUpdate(id,updateData);
-      return res.status(200).json({success:true,message:"Updated Successfully",data:updatedCenterData})
+      console.log(updatedCenterData);
+      return res.status(200).json({success:true,message:"Updated Successfully",data:updateData})
    }
    catch(error){
       return res.status(500).json({success:false,message:"Center not updated",error:error});
