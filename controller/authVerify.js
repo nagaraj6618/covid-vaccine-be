@@ -2,11 +2,13 @@ const jwt = require('jsonwebtoken');
 
 const verifyToken = (token) => {
    let reqUser = null;
-
+   
    if (!token) {
       return null;
    }
-   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+   const accessToken = token.split('Bearer')[1].trim();
+   console.log(accessToken)
+   jwt.verify(accessToken, process.env.JWT_SECRET_KEY, (err, user) => {
 
       if (err) {
          return null;
@@ -38,7 +40,7 @@ const verifyUser = (req, res, next) => {
 const verifyAdmin = (req, res, next) => {
    try {
       // console.log(req.headers)
-      const user = verifyToken(req.headers.token);
+      const user = verifyToken(req.headers.authorization);
       console.log(user)
       if (user && user.role === 'admin') {
          next();

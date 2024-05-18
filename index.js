@@ -28,6 +28,7 @@ app.use('/api/v1/center',vaccineCenter);
 
 
 app.get('/api/v1/',(req,res) => {
+   console.log(req.headers.authorization)
    res.status(200).json({message:'success',data:'server running'});
 });
 

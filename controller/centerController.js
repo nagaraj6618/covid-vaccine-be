@@ -58,9 +58,10 @@ const updateVaccineCenter = async(req,res)=> {
    try{
       const id = req.params.id
       const updateData = req.body;
-      console.log(req.body)
+      // console.log(req.body);
+      console.log(req.headers.authorization);
       const updatedCenterData = await centerModel.findByIdAndUpdate(id,updateData);
-      console.log(updatedCenterData);
+      // console.log(updatedCenterData);
       return res.status(200).json({success:true,message:"Updated Successfully",data:updateData})
    }
    catch(error){
