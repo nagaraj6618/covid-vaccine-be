@@ -6,6 +6,7 @@ dotenv.config();
 const PORT = process.env.PORT || 8000;
 const app = express();
 
+const appointmentRoute = require('./route/appointmentRoute');
 const authRoute = require('./route/authRoute');
 const vaccineCenter = require('./route/centerRoute');
 
@@ -25,10 +26,10 @@ app.use(express.urlencoded({extended:true}));
 //route page;
 app.use('/api/v1/auth',authRoute);
 app.use('/api/v1/center',vaccineCenter);
-
+app.use('/api/v1/book',appointmentRoute)
 
 app.get('/api/v1/',(req,res) => {
-   console.log(req.headers.authorization)
+   
    res.status(200).json({message:'success',data:'server running'});
 });
 

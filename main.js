@@ -1,0 +1,1 @@
+console.log(new Date("2004-06-18T00:00:00.000+00:00").toLocaleDateString())
