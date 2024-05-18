@@ -21,7 +21,7 @@ const verifyToken = (token) => {
 const verifyUser = (req, res, next) => {
    try {
       console.log(req.headers)
-      const user = verifyToken(req.headers.token);
+      const user = verifyToken(req.headers.authorization);
 
       console.log(user)
 
@@ -39,7 +39,7 @@ const verifyUser = (req, res, next) => {
 
 const verifyAdmin = (req, res, next) => {
    try {
-
+      const user = verifyToken(req.headers.authorization);
       console.log(user)
       if (user && user.role === 'admin') {
          next();

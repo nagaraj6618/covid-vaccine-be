@@ -41,7 +41,7 @@ const addNewVaccineCenter = async(req ,res) => {
          },
          dosageCount:dosageCount
       }
-      // console.log(centerData)
+      console.log(centerData)
       const newCenterData = await new centerModel(centerData);
       console.log(newCenterData);
       await newCenterData.save();

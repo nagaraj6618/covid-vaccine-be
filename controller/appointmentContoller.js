@@ -15,66 +15,111 @@ const { verifyToken } = require('./authVerify');
 //    return age;
 // }
 
+async function getAllAppointment(req, res) {
 
-
-async function addNewAppointment (req,res){
-
-   try{
-      const userDetailsFromToken = verifyToken(req.headers.authorization);
-      console.log(userDetailsFromToken);
-      if(!userDetailsFromToken){
-         return res.status(200).json({success:false,message:'You are not valid user..'});
+   try {
+      const status = req.query.status;
+      const date = req.query.date;
+      console.log(status,date);
+      if (!status && !date) {
+         const getAllAppointmentData = await appointmentModel.find();
+         return res.status(200).json(
+            { 
+               success: true,
+               message: 'Retrived all the appointment', 
+               data: getAllAppointmentData 
+            });
       }
-      const {patientName,email,phone,dob,gender,aadharNumber,appointmentDate,bookedAt,centerId,vaccineName,dosage} = req.body;
-      console.log(patientName,dob,gender,aadharNumber,appointmentDate,bookedAt,centerId,vaccineName,dosage);
-      const getAppointmentData = await appointmentModel.find({appointmentDate:appointmentDate});
-      if(getAppointmentData.length >=10){
-         return res.status(200).json({success:false,message:'Maximum book reached per day'});
+      else if (status && !date) {
+         const getAppointmentDataBasedOnStatus = await appointmentModel.find({ status: status.toLowerCase() });
+         return res.status(200).json(
+            {
+                success: true, 
+                message: `Retrive the appointment data based on the ${status}`, 
+                data: getAppointmentDataBasedOnStatus 
+            });
       }
+      else if (date && !status) {
+         const getAppointmentDataBasedOnDate = await appointmentModel.find({ appointmentDate: date });
+         return res.status(200).json({ 
+            success: true,
+            message: `Retrive the appointment data based on the ${status}`,
+            data: getAppointmentDataBasedOnDate
+         });
+      }
+      const getAllAppointmentBasedOnStatusAndDate = await appointmentModel.find(
+         {
+            status: status.toLowerCase(),
+            appointmentDate: date
+         })
+      return res.status(200).json({ success: true, message: `Retrive the appointment data based on the ${status} and ${date}`, data: getAllAppointmentBasedOnStatusAndDate });
       
-      const addNewPatientData = await new patientModel({
-         patientDetails:{
-            name:patientName,
-            gender:gender,
-            aadharNumber:aadharNumber,
-            dob:dob,
-            email:email,
-            phone:phone
-         },
-         vaccineDetails:{
-            name:vaccineName,
-            dosageCount:dosage,
-            status:false,
-         },
-         centerId:centerId,
-         userId:userDetailsFromToken.id,         
-      })
-
-      // console.log(appointmentData)
-      if(!addNewPatientData){
-         return res.status(400).json({success:false,message:'Problem in patient details..'});
-      }
-      const addNewAppointmentData = await new appointmentModel({
-         patientId:addNewPatientData._id,
-         centerId:centerId,
-         userId:userDetailsFromToken.id,
-         bookedAt: Date.now(),
-         appointmentDate:appointmentDate
-      })
-      
-      if(!addNewAppointmentData){
-         return res.status(400).json({success:false,message:'Problem in appoinment booking'});
-      }
-
-      await addNewPatientData.save()
-      await addNewAppointmentData.save();
-      res.status(200).json({sucess:true,message:'Appointment made successful',data:{patientData:addNewPatientData,appointmentData:addNewAppointmentData}});
    }
-   catch(error){
-      res.status(500).json({success:false,message:'Booking was not successfull',error:error})
+   catch (error) {
+      res.status(500).json({ status: false, message: 'Error while retriving the appointments data', error: error })
    }
-   
 }
 
 
-module.exports = {addNewAppointment}
+async function addNewAppointment(req, res) {
+
+   try {
+      const userDetailsFromToken = verifyToken(req.headers.authorization);
+      console.log(userDetailsFromToken);
+      if (!userDetailsFromToken) {
+         return res.status(400).json({ success: false, message: 'You are not valid user..' });
+      }
+      const { patientName, email, phone, dob, gender, aadharNumber, appointmentDate, bookedAt, centerId, vaccineName, dosage } = req.body;
+      console.log(patientName, dob, gender, aadharNumber, appointmentDate, bookedAt, centerId, vaccineName, dosage);
+      const getAppointmentData = await appointmentModel.find({ appointmentDate: appointmentDate });
+      if (getAppointmentData.length >= 10) {
+         return res.status(400).json({ success: false, message: 'Maximum book reached per day' });
+      }
+
+      const addNewPatientData = await new patientModel({
+         patientDetails: {
+            name: patientName,
+            gender: gender,
+            aadharNumber: aadharNumber,
+            dob: dob,
+            email: email,
+            phone: phone
+         },
+         vaccineDetails: {
+            name: vaccineName,
+            dosageCount: dosage,
+            status: false,
+         },
+         centerId: centerId,
+         userId: userDetailsFromToken.id,
+      })
+
+      // console.log(appointmentData)
+      if (!addNewPatientData) {
+         return res.status(400).json({ success: false, message: 'Problem in patient details..' });
+      }
+      const addNewAppointmentData = await new appointmentModel({
+         patientId: addNewPatientData._id,
+         centerId: centerId,
+         userId: userDetailsFromToken.id,
+         bookedAt: Date.now(),
+         appointmentDate: appointmentDate
+      })
+
+      if (!addNewAppointmentData) {
+         return res.status(400).json({ success: false, message: 'Problem in appoinment booking' });
+      }
+
+      await addNewPatientData.save();
+      await addNewAppointmentData.save();
+
+      res.status(200).json({ sucess: true, message: 'Appointment made successful', data: { patientData: addNewPatientData, appointmentData: addNewAppointmentData } });
+   }
+   catch (error) {
+      res.status(500).json({ success: false, message: 'Booking was not successfull', error: error })
+   }
+
+}
+
+
+module.exports = { addNewAppointment, getAllAppointment }

@@ -199,7 +199,7 @@ async function resetPassword(req, res) {
    console.log(req.body);
    console.log(req.headers.token)
    try {
-      const data = verifyToken(req.headers.token);
+      const data = verifyToken(req.headers.authorization);
       console.log(data)
       if (data) {
          const salt = bcrypt.genSaltSync(10);
@@ -227,7 +227,7 @@ async function resetPassword(req, res) {
 const getUserDetail = async(req,res) => {
    try{
       
-      const user = await verifyToken(req.headers.token);
+      const user = await verifyToken(req.headers.authorization);
       const userData = await userModelSchema.findById(user.id);
       if(userData.length<=0){
          return res.status(404).json({success:false,message:"User doesn't exist"});
