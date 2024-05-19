@@ -2,8 +2,18 @@ const centerModel = require('../model/centerModel');
 
 const getAllVaccineCenter = async(req,res) => {
    try{
-      const allVaccineCenter = await centerModel.find();
-      return res.status(200).json({success:true,message:'Retrived all the centers successfully',data:allVaccineCenter});
+      let active = req.query.active;
+      // console.log(active)
+      if(active === "undefined"){
+         const allVaccineCenter = await centerModel.find();
+         return res.status(200).json({success:true,message:'Retrived all the centers successfully',data:allVaccineCenter});
+      }
+      active = active==='true'?true:false;
+
+      const allVaccineCenterByStatus = await centerModel.find({
+         status:active
+      });
+      return res.status(200).json({success:true,message:'Retrived all the centers successfully 1',data:allVaccineCenterByStatus});
    }
    catch(error){
       return res.status(500).json({success:false,message:'Error while retriving the centers',error:error});
