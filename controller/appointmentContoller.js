@@ -21,6 +21,7 @@ async function getAllAppointment(req, res) {
       const status = req.query.status;
       const date = req.query.date;
       console.log(status,date);
+      
       if (!status && !date) {
          const getAllAppointmentData = await appointmentModel.find();
          return res.status(200).json(
@@ -31,7 +32,10 @@ async function getAllAppointment(req, res) {
             });
       }
       else if (status && !date) {
-         const getAppointmentDataBasedOnStatus = await appointmentModel.find({ status: status.toLowerCase() });
+         const getAppointmentDataBasedOnStatus = await appointmentModel.find(
+            {
+               status: status.toLowerCase()
+            });
          return res.status(200).json(
             {
                 success: true, 
@@ -40,7 +44,9 @@ async function getAllAppointment(req, res) {
             });
       }
       else if (date && !status) {
-         const getAppointmentDataBasedOnDate = await appointmentModel.find({ appointmentDate: date });
+         const getAppointmentDataBasedOnDate = await appointmentModel.find({ 
+            appointmentDate: date 
+         });
          return res.status(200).json({ 
             success: true,
             message: `Retrive the appointment data based on the ${status}`,
@@ -52,11 +58,19 @@ async function getAllAppointment(req, res) {
             status: status.toLowerCase(),
             appointmentDate: date
          })
-      return res.status(200).json({ success: true, message: `Retrive the appointment data based on the ${status} and ${date}`, data: getAllAppointmentBasedOnStatusAndDate });
+      return res.status(200).json({ 
+         success: true, 
+         message: `Retrive the appointment data based on the ${status} and ${date}`, 
+         data: getAllAppointmentBasedOnStatusAndDate 
+      });
       
    }
    catch (error) {
-      res.status(500).json({ status: false, message: 'Error while retriving the appointments data', error: error })
+      res.status(500).json({ 
+         status: false, 
+         message: 'Error while retriving the appointments data', 
+         error: error 
+      })
    }
 }
 
@@ -113,13 +127,50 @@ async function addNewAppointment(req, res) {
       await addNewPatientData.save();
       await addNewAppointmentData.save();
 
-      res.status(200).json({ sucess: true, message: 'Appointment made successful', data: { patientData: addNewPatientData, appointmentData: addNewAppointmentData } });
+      res.status(200).json({ sucess: true, 
+         message: 'Appointment made successful', 
+         data: { 
+            patientData: addNewPatientData, 
+            appointmentData: addNewAppointmentData 
+         } 
+      });
    }
    catch (error) {
-      res.status(500).json({ success: false, message: 'Booking was not successfull', error: error })
+      res.status(500).json({ 
+         success: false, 
+         message: 'Booking was not successfull', 
+         error: error 
+      })
    }
 
 }
 
+async function getAppointmentById (req,res){
+   try{
 
-module.exports = { addNewAppointment, getAllAppointment }
+      const {id} = req.params;
+      const appointmentDataById = await appointmentModel.findById(id);
+      // console.log(appointmentDataById)
+      if(!appointmentDataById){
+         return res.status(404).json({
+            success:false,
+            message:"Appointment ID is not Valid",
+            data:appointmentDataById,
+         })
+      }
+      res.status(200).json({
+         success:true,
+         message:'Retrivied the Appointment details',
+         data:appointmentDataById,
+      })
+   }
+   catch(error){
+      res.status(500).json({
+         success:false,
+         message:'Server Error while retriving the data',
+         error:error
+      })
+   }
+}
+
+module.exports = { addNewAppointment, getAllAppointment,getAppointmentById }
