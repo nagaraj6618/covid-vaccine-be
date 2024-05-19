@@ -3,12 +3,19 @@ const patientModel = require('../model/patientMode');
 
 async function getAllPatientDetails(req,res){
    try{
-      
+      const patientData = await patientModel.find();
+   
       res.status(200).json({
          success:true,
-         message:'Successfully retrived all the patient details',
-         data:id
-      })
+         message:'Patient data retrived successfully',
+         data:patientData,
+      });
+      
+      // res.status(200).json({
+      //    success:true,
+      //    message:'Successfully retrived all the patient details',
+      //    data:id
+      // })
    }
    catch(error){
       res.status(500).json({
@@ -21,16 +28,17 @@ async function getAllPatientDetails(req,res){
 async function getPatientDetailsById(req,res){
    try{
       const {id} = req.params;
+      const patientData = await patientModel.findById(id);
       res.status(200).json({
          success:true,
          message:'Successfully retrived all the patient details',
-         data:id
+         data:patientData
       })
    }
    catch(error){
       res.status(500).json({
          success:false,
-         message:'Patient updation failed',
+         message:error.message,
          error:error,
       })
    }
