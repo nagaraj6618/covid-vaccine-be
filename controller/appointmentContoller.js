@@ -81,13 +81,29 @@ async function addNewAppointment(req, res) {
       const userDetailsFromToken = verifyToken(req.headers.authorization);
       console.log(userDetailsFromToken);
       if (!userDetailsFromToken) {
-         return res.status(400).json({ success: false, message: 'You are not valid user..' });
+         return res.status(400).json({ 
+            success: false, 
+            message: 'You are not valid user..' 
+         });
       }
       const { patientName, email, phone, dob, gender, aadharNumber, appointmentDate, bookedAt, centerId, vaccineName, dosage } = req.body;
       console.log(patientName, dob, gender, aadharNumber, appointmentDate, bookedAt, centerId, vaccineName, dosage);
+      
+      const today = new Date(Date.now());
+      const appointmentBookingDate = new Date(appointmentDate);
+      if(appointmentBookingDate < today){
+         return res.status(200).json({
+            success:false,
+            message:`We're sorry,you cannot able to book past.Please select another date`,
+
+         })
+      }
+      
       const getAppointmentData = await appointmentModel.find({ appointmentDate: appointmentDate });
       if (getAppointmentData.length >= 10) {
-         return res.status(400).json({ success: false, message: 'Maximum book reached per day' });
+         return res.status(400).json({ 
+            success: false, 
+            message:`We're sorry, but all appointment slots are fully booked on ${appointmentDate}. Please select a different date or try again later.` });
       }
 
       const addNewPatientData = await new patientModel({
@@ -127,7 +143,7 @@ async function addNewAppointment(req, res) {
       await addNewPatientData.save();
       await addNewAppointmentData.save();
 
-      res.status(200).json({ sucess: true, 
+      res.status(200).json({ success: true, 
          message: 'Appointment made successful', 
          data: { 
             patientData: addNewPatientData, 
@@ -173,4 +189,92 @@ async function getAppointmentById (req,res){
    }
 }
 
-module.exports = { addNewAppointment, getAllAppointment,getAppointmentById }
+async function updateAppointmentById (req,res){
+   try{
+      const {id} = req.params;
+      const {status} = req.body;
+      const updateAppointmentData = await appointmentModel.findByIdAndUpdate(id,{status:status});
+      res.status(200).json({
+         success:true,
+         message:'Status updated Successfully',
+         data:updateAppointmentData
+      })
+   }
+   catch(error){
+      res.status(500).json({
+         success:false,
+         message:"server error while retriving the data",
+         error:error,
+      })
+   }
+}
+
+//get all appointment by userId,
+async function getAllAppointmentByUserId (req,res) {
+   try{
+      
+      const userDetailsFromToken = verifyToken(req.headers.authorization);
+      if(!userDetailsFromToken){
+         return res.status(400).json({
+            success:false,
+            message:'You are not valid user',
+         })
+      }
+      const {status,date} = req.query;
+      if(!status && !date){
+         console.log("testiing");
+         const appointmentData = await appointmentModel.find({userId:userDetailsFromToken.id});
+
+         return res.status(200).json({
+            success:true,
+            message:'Retrived all the appointment of the user',
+            data:appointmentData,
+         })
+      }
+      else if(status && !date){
+         console.log("Testing-2");
+         const appointmentDataBasedOnStatusAndUserId = await appointmentModel.find({
+            userId:userDetailsFromToken.id,
+            status:status.toLowerCase()
+         })
+         return res.status(200).json({
+            success:true,
+            message:'Successfull',
+            data:appointmentDataBasedOnStatusAndUserId
+         })
+      }
+      else if(!status && date){
+         console.log("Testing-3",date);
+         const appointmentDataBasedOnDateAndUserId = await appointmentModel.find({
+            userId:userDetailsFromToken.id,
+            appointmentDate:date
+         })
+         return res.status(200).json({
+            success:true,
+            message:'Successfull',
+            data:appointmentDataBasedOnDateAndUserId
+         })
+      }
+      const appointmentData = await appointmentModel.find({
+         userId:userDetailsFromToken.id,
+         appointmentDate:date,
+         status:status
+      });
+      // console.log(userDetailsFromToken);
+      res.status(200).json({
+         success:true,
+         message:'Retrived all the appointment of the user',
+         data:appointmentData,
+      })
+   }
+   catch(error){
+      res.status(500).json({
+         success:false,
+         message:"server error while retriving the data",
+         error:error,
+      })
+   }
+   
+}
+
+module.exports = { addNewAppointment, getAllAppointment,getAppointmentById,updateAppointmentById ,getAllAppointmentByUserId}

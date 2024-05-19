@@ -1,1 +1,9 @@
-console.log(new Date("2004-06-18T00:00:00.000+00:00").toLocaleDateString())
+const today = new Date( Date.now())
+const appoinmentDate = new Date("2024-05-19T06:57:33.921Z");
+
+if(today>=appoinmentDate){
+   console.log(today);
+}
+else{
+console.log(appoinmentDate)
+}
