@@ -10,12 +10,7 @@ async function getAllPatientDetails(req,res){
          message:'Patient data retrived successfully',
          data:patientData,
       });
-      
-      // res.status(200).json({
-      //    success:true,
-      //    message:'Successfully retrived all the patient details',
-      //    data:id
-      // })
+
    }
    catch(error){
       res.status(500).json({
@@ -46,10 +41,27 @@ async function getPatientDetailsById(req,res){
 async function updatePatientDetails (req,res){
    try{
       const {id} = req.params;
+      const getPatientData = await patientModel.findById(id);
+      const isAlreadyUpdated = getPatientData.vaccineDetails.status;
+      if(isAlreadyUpdated){
+         return res.status(400).json({
+            success:false,
+            message:'Already Updated patient data',
+            data:getPatientData
+         });
+      };
+      console.log(getPatientData.vaccineDetails.status)
+      const updatePatientDetails = await patientModel.findByIdAndUpdate(id,{
+         vaccineDetails:{
+            date:Date.now(),
+            status:true
+         }
+      });
+      console.log(updatePatientDetails);
       res.status(200).json({
          success:true,
          message:'Patient details updated successfully',
-         data:id
+         data:updatePatientDetails
       })
    }
    catch(error){

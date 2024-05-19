@@ -8,7 +8,7 @@ router.get('/center/:id',getPatientDetailsByCenterId);
 router.get('/user/:id',getPatientDetailsByUserId);
 
 router.get('/:id',verifyUser,getPatientDetailsById);
-router.post('/:id',updatePatientDetails);
+router.put('/:id',verifyAdmin,updatePatientDetails);
 
 
 module.exports = router;

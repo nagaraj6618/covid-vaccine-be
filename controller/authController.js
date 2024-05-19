@@ -241,4 +241,4 @@ const getUserDetail = async(req,res) => {
 }
 
 
-module.exports = {loginController,registerController,OTPVerification,resetPassword,getUserDetail}
+module.exports = {loginController,registerController,OTPVerification,resetPassword,getUserDetail,sendOTPVerificationEmail}
