@@ -76,10 +76,15 @@ async function updatePatientDetails (req,res){
 async function getPatientDetailsByUserId(req,res){
    try{
       const {id} = req.params;
+      const getPatientDataByUserId = await patientModel.find({
+         userId:id
+      });
+      console.log(getPatientDataByUserId);
+      
       res.status(200).json({
          success:true,
          message:'Get patient details by user id',
-         data:id
+         data:getPatientDataByUserId
       })
    }
    catch(error){
