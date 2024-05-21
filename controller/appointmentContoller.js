@@ -242,7 +242,7 @@ async function getAllAppointmentByUserId (req,res) {
       if(!status && !date){
          console.log("testiing");
          const appointmentData = await appointmentModel.find({userId:userDetailsFromToken.id});
-
+         
          return res.status(200).json({
             success:true,
             message:'Retrived all the appointment of the user',
