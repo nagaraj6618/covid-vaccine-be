@@ -235,6 +235,10 @@ async function getAllAppointmentByUserId (req,res) {
          })
       }
       const {status,date} = req.query;
+      if(userDetailsFromToken.role === 'admin'){
+         getAllAppointment(req,res);
+      }
+      else{
       if(!status && !date){
          console.log("testiing");
          const appointmentData = await appointmentModel.find({userId:userDetailsFromToken.id});
@@ -280,6 +284,7 @@ async function getAllAppointmentByUserId (req,res) {
          message:'Retrived all the appointment of the user',
          data:appointmentData,
       })
+   }
    }
    catch(error){
       res.status(500).json({
