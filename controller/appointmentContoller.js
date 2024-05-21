@@ -105,6 +105,20 @@ async function addNewAppointment(req, res) {
             success: false, 
             message:`We're sorry, but all appointment slots are fully booked on ${appointmentDate}. Please select a different date or try again later.` });
       }
+      const existingPatient = await patientModel.findOne({
+         $and: [
+            { 'patientDetails.aadharNumber': aadharNumber },
+            { 'vaccineDetails.name': vaccineName },
+            { 'vaccineDetails.dosageCount': dosage }
+         ]
+      });
+
+      if (existingPatient) {
+         return res.status(400).json({
+            success: false,
+            message: 'A patient with this Aadhar number or email already exists.'
+         });
+      }
 
       const addNewPatientData = await new patientModel({
          patientDetails: {
