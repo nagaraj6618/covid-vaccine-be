@@ -116,7 +116,7 @@ async function addNewAppointment(req, res) {
       if (existingPatient) {
          return res.status(400).json({
             success: false,
-            message: 'A patient with this Aadhar number or email already exists.'
+            message: 'Already Booked Check the Booking history'
          });
       }
 
